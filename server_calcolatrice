@@ -1,26 +1,42 @@
 import socket
 import json
 
-# Configurazione server
 SERVER_IP = "127.0.0.1"
 SERVER_PORT = 5005
 BUFFER_SIZE = 1024
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.bind((SERVER_IP, SERVER_PORT))
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.bind((SERVER_IP, SERVER_PORT))
 
-print("Server in attesa di richieste...")
+print("Server calcolatrice in attesa...")
 
 while True:
-    data, addr = sock.recvfrom(BUFFER_SIZE)
+    # Ricevo i dati
+    data, addr = s.recvfrom(BUFFER_SIZE)
+    if not data:
+        break
+
+    data = data.decode()
+    data = json.loads(data)
+
+    primoNumero = data["primoNumero"]
+    operazione = data["operazione"]
+    secondoNumero = data["secondoNumero"]
+
     try:
-        request = json.loads(data.decode())
+        if operazione == "+":
+            risultato = primoNumero + secondoNumero
+        elif operazione == "-":
+            risultato = primoNumero - secondoNumero
+        elif operazione == "*":
+            risultato = primoNumero * secondoNumero
+        elif operazione == "/":
+            risultato = primoNumero / secondoNumero
+        else:
+            raise ValueError("Operazione non valida")
 
-        expression = request.get("expression")
-
-        result = eval(expression) 
-        response = {"result": result}
+        risposta = json.dumps({"risultato": risultato})
     except Exception as e:
-        response = {"error": str(e)}
+        risposta = json.dumps({"errore": str(e)})
 
-    sock.sendto(json.dumps(response).encode(), addr)
+    s.sendto(risposta.encode(), addr)
