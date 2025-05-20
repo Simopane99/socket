@@ -8,12 +8,14 @@ BUFFER_SIZE = 1024
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 while True:
-    expression = input("Inserisci un'espressione (es: 3 + 4) o 'exit' per uscire: ")
-    if expression.lower() == "exit":
-        break
-
-    message = json.dumps({"expression": expression})
-    sock.sendto(message.encode(), (SERVER_IP, SERVER_PORT))
+    primoNumero= float(input("inserisci il primo nuemero: "))
+    primoNumero= input("inserisci l'operazione (simbolo): ")
+    secondoNumero= float(input("inserisci il secondo nuemero: "))
+    messaggio= {"primoNumero":primoNumero,
+                "operazione":operazione,
+                "secondoNumero":secondoNumero}
+    message = json.dumps(messaggio)
+    sock.sendto(message.encode(UTF-8), (SERVER_IP, SERVER_PORT))
 
     data, _ = sock.recvfrom(BUFFER_SIZE)
     response = json.loads(data.decode())
